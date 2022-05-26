@@ -1,0 +1,2 @@
+https://www.shoujixs.com //div[@class="bookname"]/h1/text() //div[@id="zjny"]
+https://www.shouda88.com //div[@class="kfyd"]/h2/text() //div[@id="content"]
