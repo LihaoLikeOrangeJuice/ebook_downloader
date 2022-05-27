@@ -21,8 +21,7 @@ for domain_xpath in domain_xpath_list:
         save_xpath = False
 
 if save_xpath:
-    content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH"
-                          "(不支持由br分隔小说内容的网站):")
+    content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
     title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
 
 begin_time = time.time()
@@ -32,6 +31,7 @@ s = requests.session()
 title = ""
 file = open("./ebook.txt", "w")
 file.close()
+content_method = 1
 url_method = 1
 
 while True:
@@ -50,7 +50,17 @@ while True:
             logger.warning("获取页面失败\n" + str(e))
 
     tree = html.fromstring(page.content)
-    content_text_list = tree.xpath(content_xpath + "/p/text()")
+
+    if content_method == 1:
+        content_text_list = tree.xpath(content_xpath + "/p/text()")
+        if not len(content_text_list):
+            content_text_list = tree.xpath(content_xpath + "/text()")
+            content_method = 2
+    elif content_method == 2:
+        content_text_list = tree.xpath(content_xpath + "/text()")
+        if not len(content_text_list):
+            content_text_list = tree.xpath(content_xpath + "/p/text()")
+            content_method = 1
 
     with open("./ebook.txt", "a") as file:
         if title != tree.xpath(title_xpath)[0]:
