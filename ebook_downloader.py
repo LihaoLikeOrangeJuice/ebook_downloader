@@ -32,6 +32,7 @@ s = requests.session()
 title = ""
 file = open("./ebook.txt", "w")
 file.close()
+url_method = 1
 
 while True:
     headers = {
@@ -61,7 +62,24 @@ while True:
             file.write(content_text + "\n")
 
     referer = url
-    url = base_url + tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
+
+    if url_method == 1:
+        try:
+            url = base_url + tree.xpath(
+                "//a[contains(text(), '下一章')]/@href")[0]
+        except Exception:
+            url = base_url + tree.xpath(
+                "//a[contains(text(), '下一页')]/@href")[0]
+            url_method = 2
+    elif url_method == 2:
+        try:
+            url = base_url + tree.xpath(
+                "//a[contains(text(), '下一页')]/@href")[0]
+        except Exception:
+            url = base_url + tree.xpath(
+                "//a[contains(text(), '下一章')]/@href")[0]
+            url_method = 1
+
     logger.info("下一页链接:" + url + "\n")
 
     if url == end_url:
