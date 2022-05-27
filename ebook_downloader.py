@@ -58,7 +58,7 @@ while True:
             logger.info("标题:\t" + title)
             file.write("\n" + title + '\n')
 
-        for content_text in content_text_list[0:-1]:
+        for content_text in content_text_list:
             file.write(content_text + "\n")
 
     referer = url
