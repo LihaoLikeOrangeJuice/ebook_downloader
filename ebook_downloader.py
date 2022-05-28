@@ -9,18 +9,13 @@ referer = input("请输入小说目录的网址:")
 url = input("请输入小说第一章的网址:")
 end_url = input("请输入小说最后一章的网址:")
 
+split_url = url.split("/")
+base_url = split_url[0] + "/" + split_url[1] + "/" + split_url[2]
+
 begin_time = time.time()
 s = requests.session()
 file = open("./ebook.txt", "w")
 file.close()
-
-split_url = url.split("/")
-base_url = split_url[0] + "/" + split_url[1] + "/" + split_url[2]
-title = ""
-
-content_method = 1
-href_method = 1
-finish_task = False
 
 headers = {
     "User-Agent":
@@ -47,7 +42,11 @@ with open("content_xpath.txt", "r") as file:
     content_xpath_list = file.read().split(" ")
 
 for tx in title_xpath_list[0:-1]:
-    title = tree.xpath(tx)[0]
+    title = tree.xpath(tx)
+    if len(title):
+        title = title[0]
+    else:
+        continue
     if len(re.findall(
             "章", title)) and (len(re.findall("\d", title))
                               or len(re.findall("[零一二三四五六七八九十百千万亿]", title))
@@ -57,6 +56,11 @@ for tx in title_xpath_list[0:-1]:
         break
 if not find_title_xpath:
     for tx in title_xpath_list[0:-1]:
+        title = tree.xpath(tx)
+        if len(title):
+            title = title[0]
+        else:
+            continue
         title = tree.xpath(tx)[0]
         if len(re.findall("\d", title)) or len(
                 re.findall("[零一二三四五六七八九十百千万亿]", title)) or len(
@@ -91,13 +95,12 @@ logger.info(f"标题XPATH:{title_xpath}")
 logger.info(f"内容XPATH:{content_xpath}")
 logger.info("开始下载小说")
 
-while True:
-    headers = {
-        "User-Agent":
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36 Edg/101.0.1210.53",
-        "Referer": referer
-    }
+content_method = 1
+href_method = 1
+finish_task = False
+title = ""
 
+while True:
     while True:
         try:
             page = s.get(url, headers=headers, timeout=5)
