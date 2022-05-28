@@ -6,7 +6,7 @@ from lxml import html
 
 end_url = input("请输入小说目录的网址:")
 referer = url = input("请输入小说第一章的网址:")
-base_url = url.split("com")[0] + "com"
+base_url = "https://" + url.split("/")[2]
 
 with open("XPATH.txt", "r") as file:
     domain_xpath_list = file.read().split("\n")
