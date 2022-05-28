@@ -11,18 +11,10 @@ begin_time = time.time()
 split_url = url.split("/")
 base_url = split_url[0] + "/" + split_url[1] + "/" + split_url[2]
 
-with open("XPATH.txt", "r") as file:
-    domain_xpath_list = file.read().split("\n")
-
-save_xpath = True
-
-for domain_xpath in domain_xpath_list[0:-1]:
-    domain_xpath = domain_xpath.split(" ")
-    if base_url == domain_xpath[0]:
-        title_xpath = domain_xpath[1]
-        content_xpath = domain_xpath[2]
-        logger.info(f"符合网址{domain_xpath[0]},使用已收录的XPATH进行爬取")
-        save_xpath = False
+with open("title_xpath.txt", "r") as file:
+    title_xpath_list = file.read().split(" ")
+with open("content_xpath.txt", "r") as file:
+    content_xpath_list = file.read().split(" ")
 
 s = requests.session()
 title = ""
@@ -47,38 +39,29 @@ while True:
 
 tree = html.fromstring(page.content)
 
-if save_xpath:
-    logger.info("正在智能匹配XPATH")
-    find_title_xpath = find_content_xpath = False
-    for domain_xpath in domain_xpath_list[0:-1]:
-        domain_xpath = domain_xpath.split(" ")
-        if not find_content_xpath and not find_title_xpath:
-            if len(tree.xpath(domain_xpath[2])):
-                content_xpath = domain_xpath[2]
-                find_content_xpath = True
-            if len(tree.xpath(domain_xpath[1])):
-                title_xpath = domain_xpath[1]
-                find_title_xpath = True
-        elif find_content_xpath and not find_title_xpath:
-            if len(tree.xpath(domain_xpath[1])):
-                title_xpath = domain_xpath[1]
-                find_title_xpath = True
-        elif not find_content_xpath and find_title_xpath:
-            if len(tree.xpath(domain_xpath[2])):
-                content_xpath = domain_xpath[2]
-                find_content_xpath = True
+logger.info("正在智能匹配XPATH")
+find_title_xpath = find_content_xpath = False
 
-        if find_content_xpath and find_title_xpath:
-            save_xpath = False
-            logger.info("XPATH匹配成功")
-            break
+for tx in title_xpath_list[0:-1]:
+    if len(tree.xpath(tx)):
+        title_xpath = tx
+        find_title_xpath = True
+        break
 
-if save_xpath:
+for cx in content_xpath_list[0:-1]:
+    if len(tree.xpath(cx)):
+        content_xpath = cx
+        find_content_xpath = True
+        break
+
+if find_content_xpath and find_title_xpath:
+    save_xpath = False
+    logger.info("XPATH匹配成功")
+else:
+    save_xpath = True
     logger.info("XPATH匹配失败")
 
-if not save_xpath:
-    pass
-elif save_xpath and not find_content_xpath and not find_title_xpath:
+if save_xpath and not find_content_xpath and not find_title_xpath:
     content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
     title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
 elif save_xpath and find_content_xpath and not find_title_xpath:
@@ -160,9 +143,17 @@ while True:
         logger.info("小说下载完成")
         break
 
-if save_xpath:
-    with open("XPATH.txt", "a") as file:
-        file.write(base_url + " " + title_xpath + " " + content_xpath + "\n")
+if save_xpath and not find_content_xpath and not find_title_xpath:
+    with open("title_xpath.txt", "r") as file:
+        file.write(title_xpath + " ")
+    with open("content_xpath.txt", "r") as file:
+        file.write(content_xpath + " ")
+elif save_xpath and find_content_xpath and not find_title_xpath:
+    with open("title_xpath.txt", "r") as file:
+        file.write(title_xpath + " ")
+elif save_xpath and not find_content_xpath and find_title_xpath:
+    with open("content_xpath.txt", "r") as file:
+        file.write(content_xpath + " ")
 
 total_time = time.time() - begin_time
 logger.info("总耗时（单位：分钟）:" + str(int(total_time / 60)))
