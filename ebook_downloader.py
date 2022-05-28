@@ -93,10 +93,28 @@ elif save_xpath and not find_content_xpath and find_title_xpath:
 
 logger.info(f"标题XPATH:{title_xpath}")
 logger.info(f"内容XPATH:{content_xpath}")
+
+if len(tree.xpath(content_xpath + "/p/text()")) > 20:
+    content_method = 1
+elif len(tree.xpath(content_xpath + "/text()")) > 20:
+    content_method = 2
+else:
+    logger.error("内容XPATH无法定位到元素或定位到的元素过少")
+    logger.info(
+        f"\"/p/text()\"方法定位到的元素数量:{len(tree.xpath(content_xpath + '/p/text()'))}"
+    )
+    logger.info(
+        f"\"/text()\"方法定位到的元素数量:{len(tree.xpath(content_xpath + '/text()'))}")
+
+if len(tree.xpath("//a[contains(text(), '下一章')]/@href")):
+    href_method = 1
+elif len(tree.xpath("//a[contains(text(), '下一页')]/@href")):
+    href_method = 2
+else:
+    logger.error("无法找到下一章的连接")
+
 logger.info("开始下载小说\n")
 
-content_method = 1
-href_method = 1
 finish_task = False
 title = ""
 
@@ -113,20 +131,8 @@ while True:
 
     if content_method == 1:
         content_text_list = tree.xpath(content_xpath + "/p/text()")
-        if not len(content_text_list):
-            content_text_list = tree.xpath(content_xpath + "/text()")
-            if not len(content_text_list):
-                logger.error("小说内容获取失败")
-            else:
-                content_method = 2
     elif content_method == 2:
         content_text_list = tree.xpath(content_xpath + "/text()")
-        if not len(content_text_list):
-            content_text_list = tree.xpath(content_xpath + "/p/text()")
-            if not len(content_text_list):
-                logger.error("小说内容获取失败")
-            else:
-                content_method = 1
 
     with open("./ebook.txt", "a") as file:
         if title != tree.xpath(title_xpath)[0]:
@@ -140,17 +146,9 @@ while True:
     referer = url
 
     if href_method == 1:
-        try:
-            href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
-        except Exception:
-            href = tree.xpath("//a[contains(text(), '下一页')]/@href")[0]
-            href_method = 2
+        href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
     elif href_method == 2:
-        try:
-            href = tree.xpath("//a[contains(text(), '下一页')]/@href")[0]
-        except Exception:
-            href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
-            href_method = 1
+        href = tree.xpath("//a[contains(text(), '下一页')]/@href")[0]
 
     if len(re.findall("http", href)):
         url = href
