@@ -84,7 +84,8 @@ elif save_xpath and find_content_xpath and not find_title_xpath:
 elif save_xpath and not find_content_xpath and find_title_xpath:
     content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
 
-logger.info(f"标题XPATH:{title_xpath}\n内容XPATH{content_xpath}")
+logger.info(f"标题XPATH:{title_xpath}")
+logger.info(f"内容XPATH{content_xpath}")
 logger.info("开始下载小说")
 
 while True:
