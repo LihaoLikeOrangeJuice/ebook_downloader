@@ -36,7 +36,7 @@ headers = {
     "Referer": referer
 }
 
-for retries in range(20):
+while True:
     try:
         page = s.get(url, headers=headers, timeout=5)
         logger.info("成功获取到页面")
@@ -96,7 +96,7 @@ while True:
         "Referer": referer
     }
 
-    for retries in range(20):
+    while True:
         try:
             page = s.get(url, headers=headers, timeout=5)
             logger.info("成功获取到页面")
