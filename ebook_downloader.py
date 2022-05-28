@@ -8,7 +8,8 @@ from lxml import html
 referer = end_url = input("请输入小说目录的网址:")
 url = input("请输入小说第一章的网址:")
 begin_time = time.time()
-base_url = "https://" + url.split("/")[2]
+split_url = url.split("/")
+base_url = split_url[0] + "/" + split_url[1] + "/" + split_url[2]
 
 with open("XPATH.txt", "r") as file:
     domain_xpath_list = file.read().split("\n")
