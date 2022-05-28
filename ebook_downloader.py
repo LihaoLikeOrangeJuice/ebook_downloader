@@ -87,19 +87,6 @@ elif save_xpath and not find_content_xpath and find_title_xpath:
 
 logger.info(f"标题XPATH:{title_xpath}")
 logger.info(f"内容XPATH:{content_xpath}")
-
-try:
-    href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
-except Exception:
-    href = tree.xpath("//a[contains(text(), '下一页')]/@href")[0]
-
-if len(re.findall("http", href)):
-    url_method = 2
-elif len(re.findall("/", href)):
-    url_method = 1
-else:
-    url_method = 3
-
 logger.info("开始下载小说")
 
 while True:
@@ -154,11 +141,11 @@ while True:
             href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
             href_method = 1
 
-    if url_method == 1:
-        url = base_url + href
-    elif url_method == 2:
+    if len(re.findall("http", href)):
         url = href
-    elif url_method == 3:
+    elif len(re.findall("/", href)):
+        url = base_url + href
+    else:
         url = url.split("/")
         new_url = ""
         for partof_url in url[0:-1]:
