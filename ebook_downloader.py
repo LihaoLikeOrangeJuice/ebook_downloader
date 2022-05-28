@@ -5,8 +5,9 @@ import requests
 from loguru import logger
 from lxml import html
 
-referer = end_url = input("请输入小说目录的网址:")
+referer = input("请输入小说目录的网址:")
 url = input("请输入小说第一章的网址:")
+end_url = input("请输入小说最后一章的网址:")
 
 begin_time = time.time()
 s = requests.session()
@@ -19,6 +20,7 @@ title = ""
 
 content_method = 1
 href_method = 1
+finish_task = False
 
 headers = {
     "User-Agent":
@@ -158,12 +160,14 @@ while True:
             new_url = new_url + partof_url + "/"
         new_url += href
         url = new_url
-
     logger.info("下一页链接:" + url + "\n")
 
-    if url == end_url:
+    if finish_task:
         logger.info("小说下载完成")
         break
+
+    if url == end_url:
+        finish_task = True
 
 if save_xpath and not find_content_xpath and not find_title_xpath:
     with open("title_xpath.txt", "a") as file:
