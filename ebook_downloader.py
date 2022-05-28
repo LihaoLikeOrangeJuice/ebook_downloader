@@ -20,10 +20,6 @@ for domain_xpath in domain_xpath_list:
         content_xpath = domain_xpath[2]
         save_xpath = False
 
-if save_xpath:
-    content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
-    title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
-
 begin_time = time.time()
 logger.info("开始下载")
 
@@ -50,6 +46,37 @@ while True:
             logger.warning("获取页面失败\n" + str(e))
 
     tree = html.fromstring(page.content)
+
+    find_title_xpath = find_content_xpath = False
+    for domain_xpath in domain_xpath_list:
+        domain_xpath = domain_xpath.split(" ")
+        if not find_content_xpath and not find_title_xpath:
+            if len(tree.xpath(domain_xpath[2])):
+                content_xpath = domain_xpath[2]
+                find_content_xpath = True
+            if len(tree.xpath(domain_xpath[1])):
+                title_xpath = domain_xpath[1]
+                find_title_xpath = True
+        elif find_content_xpath and not find_title_xpath:
+            if len(tree.xpath(domain_xpath[1])):
+                title_xpath = domain_xpath[1]
+                find_title_xpath = True
+        elif not find_content_xpath and find_title_xpath:
+            if len(tree.xpath(domain_xpath[2])):
+                content_xpath = domain_xpath[2]
+                find_content_xpath = True
+
+        if find_content_xpath and find_title_xpath:
+            save_xpath = False
+            break
+
+    if save_xpath and not find_content_xpath and not find_title_xpath:
+        content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
+        title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
+    elif save_xpath and find_content_xpath and not find_title_xpath:
+        title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
+    elif save_xpath and not find_content_xpath and find_title_xpath:
+        content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
 
     if content_method == 1:
         content_text_list = tree.xpath(content_xpath + "/p/text()")
