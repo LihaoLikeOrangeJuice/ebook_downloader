@@ -93,7 +93,7 @@ elif save_xpath and not find_content_xpath and find_title_xpath:
 
 logger.info(f"标题XPATH:{title_xpath}")
 logger.info(f"内容XPATH:{content_xpath}")
-logger.info("开始下载小说")
+logger.info("开始下载小说\n")
 
 content_method = 1
 href_method = 1
