@@ -1,3 +1,4 @@
+import re
 import time
 
 import requests
@@ -27,7 +28,7 @@ title = ""
 file = open("./ebook.txt", "w")
 file.close()
 content_method = 1
-url_method = 1
+href_method = 1
 
 headers = {
     "User-Agent":
@@ -86,6 +87,17 @@ elif save_xpath and not find_content_xpath and find_title_xpath:
 
 logger.info(f"标题XPATH:{title_xpath}")
 logger.info(f"内容XPATH{content_xpath}")
+
+try:
+    href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
+except Exception:
+    href = tree.xpath("//a[contains(text(), '下一页')]/@href")[0]
+
+if len(re.findall("http", href)):
+    url_method = 2
+else:
+    url_method = 1
+
 logger.info("开始下载小说")
 
 while True:
@@ -127,22 +139,23 @@ while True:
 
     referer = url
 
+    if href_method == 1:
+        try:
+            href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
+        except Exception:
+            href = tree.xpath("//a[contains(text(), '下一页')]/@href")[0]
+            href_method = 2
+    elif href_method == 2:
+        try:
+            href = tree.xpath("//a[contains(text(), '下一页')]/@href")[0]
+        except Exception:
+            href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
+            href_method = 1
+
     if url_method == 1:
-        try:
-            url = base_url + tree.xpath(
-                "//a[contains(text(), '下一章')]/@href")[0]
-        except Exception:
-            url = base_url + tree.xpath(
-                "//a[contains(text(), '下一页')]/@href")[0]
-            url_method = 2
+        url = base_url + href
     elif url_method == 2:
-        try:
-            url = base_url + tree.xpath(
-                "//a[contains(text(), '下一页')]/@href")[0]
-        except Exception:
-            url = base_url + tree.xpath(
-                "//a[contains(text(), '下一章')]/@href")[0]
-            url_method = 1
+        url = href
 
     logger.info("下一页链接:" + url + "\n")
 
