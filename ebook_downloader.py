@@ -36,7 +36,7 @@ headers = {
     "Referer": referer
 }
 
-while True:
+for retries in range(20):
     try:
         page = s.get(url, headers=headers, timeout=5)
         logger.info("成功获取到页面")
@@ -86,7 +86,7 @@ elif save_xpath and not find_content_xpath and find_title_xpath:
     content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
 
 logger.info(f"标题XPATH:{title_xpath}")
-logger.info(f"内容XPATH{content_xpath}")
+logger.info(f"内容XPATH:{content_xpath}")
 
 try:
     href = tree.xpath("//a[contains(text(), '下一章')]/@href")[0]
@@ -95,8 +95,10 @@ except Exception:
 
 if len(re.findall("http", href)):
     url_method = 2
-else:
+elif len(re.findall("/", href)):
     url_method = 1
+else:
+    url_method = 3
 
 logger.info("开始下载小说")
 
@@ -107,7 +109,7 @@ while True:
         "Referer": referer
     }
 
-    while True:
+    for retries in range(20):
         try:
             page = s.get(url, headers=headers, timeout=5)
             logger.info("成功获取到页面")
@@ -156,6 +158,13 @@ while True:
         url = base_url + href
     elif url_method == 2:
         url = href
+    elif url_method == 3:
+        url = url.split("/")
+        new_url = ""
+        for partof_url in url[0:-1]:
+            new_url = new_url + partof_url + "/"
+        new_url += href
+        url = new_url
 
     logger.info("下一页链接:" + url + "\n")
 
