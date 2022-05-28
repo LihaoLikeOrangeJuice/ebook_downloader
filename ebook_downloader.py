@@ -185,4 +185,4 @@ elif save_xpath and not find_content_xpath and find_title_xpath:
         file.write(content_xpath + " ")
 
 total_time = time.time() - begin_time
-logger.info("总耗时（单位：分钟）:" + str(int(total_time / 60)))
+logger.info(f"总耗时: {str(int(total_time / 60))}分钟{str(int(total_time % 60))}秒")
