@@ -45,12 +45,27 @@ with open("content_xpath.txt", "r") as file:
     content_xpath_list = file.read().split(" ")
 
 for tx in title_xpath_list[0:-1]:
-    if len(tree.xpath(tx)):
+    title = tree.xpath(tx)
+    if len(re.findall(
+            "章", title)) and (len(re.findall("\d", title))
+                              or len(re.findall("[零一二三四五六七八九十百千万亿]", title))
+                              or len(re.findall("[零壹贰叁肆伍陆柒捌玖拾佰仟万亿]", title))):
         title_xpath = tx
         find_title_xpath = True
         break
+if not find_title_xpath:
+    for tx in title_xpath_list[0:-1]:
+        title = tree.xpath(tx)
+        if len(re.findall("\d", title)) or len(
+                re.findall("[零一二三四五六七八九十百千万亿]", title)) or len(
+                    re.findall("[零壹贰叁肆伍陆柒捌玖拾佰仟万亿]", title)):
+            title_xpath = tx
+            find_title_xpath = True
+            break
+
 for cx in content_xpath_list[0:-1]:
-    if len(tree.xpath(cx)):
+    if len(tree.xpath(cx + "/p/text()")) > 20 or len(
+            tree.xpath(cx + "/text()")) > 20:
         content_xpath = cx
         find_content_xpath = True
         break
