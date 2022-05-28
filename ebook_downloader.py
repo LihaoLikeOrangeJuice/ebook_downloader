@@ -6,6 +6,7 @@ from lxml import html
 
 referer = end_url = input("请输入小说目录的网址:")
 url = input("请输入小说第一章的网址:")
+begin_time = time.time()
 base_url = "https://" + url.split("/")[2]
 
 with open("XPATH.txt", "r") as file:
@@ -18,10 +19,8 @@ for domain_xpath in domain_xpath_list:
     if base_url == domain_xpath[0]:
         title_xpath = domain_xpath[1]
         content_xpath = domain_xpath[2]
+        logger.info(f"符合网址{domain_xpath[0]},使用已收录的XPATH进行爬取")
         save_xpath = False
-
-begin_time = time.time()
-logger.info("开始下载")
 
 s = requests.session()
 title = ""
@@ -47,6 +46,7 @@ while True:
 tree = html.fromstring(page.content)
 
 if save_xpath:
+    logger.info("正在智能匹配XPATH")
     find_title_xpath = find_content_xpath = False
     for domain_xpath in domain_xpath_list:
         domain_xpath = domain_xpath.split(" ")
@@ -68,7 +68,11 @@ if save_xpath:
 
         if find_content_xpath and find_title_xpath:
             save_xpath = False
+            logger.info("XPATH匹配成功")
             break
+
+if save_xpath:
+    logger.info("XPATH匹配失败")
 
 if not save_xpath:
     pass
@@ -79,6 +83,9 @@ elif save_xpath and find_content_xpath and not find_title_xpath:
     title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
 elif save_xpath and not find_content_xpath and find_title_xpath:
     content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
+
+logger.info(f"标题XPATH:{title_xpath}\n内容XPATH{content_xpath}")
+logger.info("开始下载小说")
 
 while True:
     headers = {
