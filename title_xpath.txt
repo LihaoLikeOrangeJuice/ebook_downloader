@@ -1,1 +1,1 @@
-//div[@class="bookname"]/h1/text() //div[@class="kfyd"]/h2/text() //h1[@class="title"]/text() //div[@class="txt_cont"]/h1/text() 
+//div[@class="bookname"]/h1/text() //div[@class="kfyd"]/h2/text() //h1[@class="title"]/text() //div[@class="txt_cont"]/h1/text() //div[@class="content"]/h1/text() 
