@@ -15,7 +15,7 @@ with open("XPATH.txt", "r") as file:
 
 save_xpath = True
 
-for domain_xpath in domain_xpath_list:
+for domain_xpath in domain_xpath_list[0:-1]:
     domain_xpath = domain_xpath.split(" ")
     if base_url == domain_xpath[0]:
         title_xpath = domain_xpath[1]
@@ -49,7 +49,7 @@ tree = html.fromstring(page.content)
 if save_xpath:
     logger.info("正在智能匹配XPATH")
     find_title_xpath = find_content_xpath = False
-    for domain_xpath in domain_xpath_list:
+    for domain_xpath in domain_xpath_list[0:-1]:
         domain_xpath = domain_xpath.split(" ")
         if not find_content_xpath and not find_title_xpath:
             if len(tree.xpath(domain_xpath[2])):
