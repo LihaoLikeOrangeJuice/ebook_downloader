@@ -45,7 +45,7 @@ with open("content_xpath.txt", "r") as file:
     content_xpath_list = file.read().split(" ")
 
 for tx in title_xpath_list[0:-1]:
-    title = tree.xpath(tx)
+    title = tree.xpath(tx)[0]
     if len(re.findall(
             "章", title)) and (len(re.findall("\d", title))
                               or len(re.findall("[零一二三四五六七八九十百千万亿]", title))
@@ -55,7 +55,7 @@ for tx in title_xpath_list[0:-1]:
         break
 if not find_title_xpath:
     for tx in title_xpath_list[0:-1]:
-        title = tree.xpath(tx)
+        title = tree.xpath(tx)[0]
         if len(re.findall("\d", title)) or len(
                 re.findall("[零一二三四五六七八九十百千万亿]", title)) or len(
                     re.findall("[零壹贰叁肆伍陆柒捌玖拾佰仟万亿]", title)):
@@ -110,12 +110,18 @@ while True:
         content_text_list = tree.xpath(content_xpath + "/p/text()")
         if not len(content_text_list):
             content_text_list = tree.xpath(content_xpath + "/text()")
-            content_method = 2
+            if not len(content_text_list):
+                logger.error("小说内容获取失败")
+            else:
+                content_method = 2
     elif content_method == 2:
         content_text_list = tree.xpath(content_xpath + "/text()")
         if not len(content_text_list):
             content_text_list = tree.xpath(content_xpath + "/p/text()")
-            content_method = 1
+            if not len(content_text_list):
+                logger.error("小说内容获取失败")
+            else:
+                content_method = 1
 
     with open("./ebook.txt", "a") as file:
         if title != tree.xpath(title_xpath)[0]:
