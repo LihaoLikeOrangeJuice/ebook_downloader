@@ -7,19 +7,16 @@ from lxml import html
 
 referer = end_url = input("请输入小说目录的网址:")
 url = input("请输入小说第一章的网址:")
+
 begin_time = time.time()
-split_url = url.split("/")
-base_url = split_url[0] + "/" + split_url[1] + "/" + split_url[2]
-
-with open("title_xpath.txt", "r") as file:
-    title_xpath_list = file.read().split(" ")
-with open("content_xpath.txt", "r") as file:
-    content_xpath_list = file.read().split(" ")
-
 s = requests.session()
-title = ""
 file = open("./ebook.txt", "w")
 file.close()
+
+split_url = url.split("/")
+base_url = split_url[0] + "/" + split_url[1] + "/" + split_url[2]
+title = ""
+
 content_method = 1
 href_method = 1
 
@@ -42,12 +39,16 @@ tree = html.fromstring(page.content)
 logger.info("正在智能匹配XPATH")
 find_title_xpath = find_content_xpath = False
 
+with open("title_xpath.txt", "r") as file:
+    title_xpath_list = file.read().split(" ")
+with open("content_xpath.txt", "r") as file:
+    content_xpath_list = file.read().split(" ")
+
 for tx in title_xpath_list[0:-1]:
     if len(tree.xpath(tx)):
         title_xpath = tx
         find_title_xpath = True
         break
-
 for cx in content_xpath_list[0:-1]:
     if len(tree.xpath(cx)):
         content_xpath = cx
@@ -144,15 +145,15 @@ while True:
         break
 
 if save_xpath and not find_content_xpath and not find_title_xpath:
-    with open("title_xpath.txt", "r") as file:
+    with open("title_xpath.txt", "a") as file:
         file.write(title_xpath + " ")
-    with open("content_xpath.txt", "r") as file:
+    with open("content_xpath.txt", "a") as file:
         file.write(content_xpath + " ")
 elif save_xpath and find_content_xpath and not find_title_xpath:
-    with open("title_xpath.txt", "r") as file:
+    with open("title_xpath.txt", "a") as file:
         file.write(title_xpath + " ")
 elif save_xpath and not find_content_xpath and find_title_xpath:
-    with open("content_xpath.txt", "r") as file:
+    with open("content_xpath.txt", "a") as file:
         file.write(content_xpath + " ")
 
 total_time = time.time() - begin_time
