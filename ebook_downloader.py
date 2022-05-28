@@ -62,12 +62,12 @@ else:
     logger.info("XPATH匹配失败")
 
 if save_xpath and not find_content_xpath and not find_title_xpath:
-    content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
+    content_xpath = input("请输入小说第一章的页面中小说内容所在的标签(一般是div标签)的XPATH:")
     title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
 elif save_xpath and find_content_xpath and not find_title_xpath:
     title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
 elif save_xpath and not find_content_xpath and find_title_xpath:
-    content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
+    content_xpath = input("请输入小说第一章的页面中小说内容所在的标签(一般是div标签)的XPATH:")
 
 logger.info(f"标题XPATH:{title_xpath}")
 logger.info(f"内容XPATH:{content_xpath}")
