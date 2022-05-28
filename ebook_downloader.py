@@ -4,8 +4,8 @@ import requests
 from loguru import logger
 from lxml import html
 
-end_url = input("请输入小说目录的网址:")
-referer = url = input("请输入小说第一章的网址:")
+referer = end_url = input("请输入小说目录的网址:")
+url = input("请输入小说第一章的网址:")
 base_url = "https://" + url.split("/")[2]
 
 with open("XPATH.txt", "r") as file:
