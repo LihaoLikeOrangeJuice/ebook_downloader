@@ -30,23 +30,23 @@ file.close()
 content_method = 1
 url_method = 1
 
+headers = {
+    "User-Agent":
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36 Edg/101.0.1210.53",
+    "Referer": referer
+}
+
 while True:
-    headers = {
-        "User-Agent":
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36 Edg/101.0.1210.53",
-        "Referer": referer
-    }
+    try:
+        page = s.get(url, headers=headers, timeout=5)
+        logger.info("成功获取到页面")
+        break
+    except Exception as e:
+        logger.warning("获取页面失败\n" + str(e))
 
-    while True:
-        try:
-            page = s.get(url, headers=headers, timeout=5)
-            logger.info("成功获取到页面")
-            break
-        except Exception as e:
-            logger.warning("获取页面失败\n" + str(e))
+tree = html.fromstring(page.content)
 
-    tree = html.fromstring(page.content)
-
+if save_xpath:
     find_title_xpath = find_content_xpath = False
     for domain_xpath in domain_xpath_list:
         domain_xpath = domain_xpath.split(" ")
@@ -70,13 +70,32 @@ while True:
             save_xpath = False
             break
 
-    if save_xpath and not find_content_xpath and not find_title_xpath:
-        content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
-        title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
-    elif save_xpath and find_content_xpath and not find_title_xpath:
-        title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
-    elif save_xpath and not find_content_xpath and find_title_xpath:
-        content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
+if not save_xpath:
+    pass
+elif save_xpath and not find_content_xpath and not find_title_xpath:
+    content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
+    title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
+elif save_xpath and find_content_xpath and not find_title_xpath:
+    title_xpath = input("请输入小说第一章的页面中章节名称所在标签的文字内容的XPATH:")
+elif save_xpath and not find_content_xpath and find_title_xpath:
+    content_xpath = input("请输入小说第一章的页面中小说内容所在的div标签的XPATH:")
+
+while True:
+    headers = {
+        "User-Agent":
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36 Edg/101.0.1210.53",
+        "Referer": referer
+    }
+
+    while True:
+        try:
+            page = s.get(url, headers=headers, timeout=5)
+            logger.info("成功获取到页面")
+            break
+        except Exception as e:
+            logger.warning("获取页面失败\n" + str(e))
+
+    tree = html.fromstring(page.content)
 
     if content_method == 1:
         content_text_list = tree.xpath(content_xpath + "/p/text()")
